@@ -4,6 +4,7 @@ import yaml
 
 from tornado.escape import json_decode
 from tornado.ioloop import IOLoop
+from tornado.log import app_log
 from tornado.options import define, options, parse_command_line
 from tornado.process import Subprocess
 from tornado.routing import AnyMatches
@@ -23,12 +24,16 @@ class WebhookHandler(RequestHandler):
         # data = json_decode(self.request.body)
         for hook in hooks:
             if hook.get('hook') == url:  # TODO: better matching method
+                app_log.info(f'URL {url} matched')
                 args = [hook.get('cmd', '/bin/bash')] + hook.get('args', [])
+                app_log.info(f'Executing task {args}')
                 proc = Subprocess(args)
                 code = await proc.wait_for_exit(False)
+                app_log.info(f'Task {args} done')
                 self.write({'status': 'success', 'code': code})
                 break
         else:
+            app_log.warning(f'URL {url} not configured')
             self.write({'status': 'failure'})
             self.set_status(400)
 
