@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tornado-webhook"
-description = ''
+description = "Tornado Webhook is a web application to execute webhook actions."
 readme = "README.md"
 requires-python = ">=3.7"
 license = "MIT"
-keywords = []
+keywords = ["tornado", "webhook"]
 authors = [
   { name = "Wentao Han", email = "wentao.han@gmail.com" },
 ]
@@ -22,13 +22,13 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+dependencies = ["tornado"]
 dynamic = ["version"]
 
 [project.urls]
-Documentation = "https://github.com/unknown/tornado-webhook#readme"
-Issues = "https://github.com/unknown/tornado-webhook/issues"
-Source = "https://github.com/unknown/tornado-webhook"
+Documentation = "https://github.com/hanwentao/tornado-webhook#readme"
+Issues = "https://github.com/hanwentao/tornado-webhook/issues"
+Source = "https://github.com/hanwentao/tornado-webhook"
 
 [tool.hatch.version]
 path = "tornado_webhook/__about__.py"
