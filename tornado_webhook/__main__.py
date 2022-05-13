@@ -28,9 +28,10 @@ class WebhookHandler(RequestHandler):
                 args = [hook.get('cmd', '/bin/bash')] + hook.get('args', [])
                 app_log.info(f'Executing task {args}')
                 proc = Subprocess(args)
-                code = await proc.wait_for_exit(False)
-                app_log.info(f'Task {args} done')
-                self.write({'status': 'success', 'code': code})
+                def proc_exit_callback(code):
+                    app_log.info(f'Task {args} done with code {code}')
+                proc.set_exit_callback(proc_exit_callback)
+                self.write({'status': 'executing'})
                 break
         else:
             app_log.warning(f'URL {url} not configured')
