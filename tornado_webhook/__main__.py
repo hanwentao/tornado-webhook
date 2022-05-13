@@ -3,6 +3,7 @@
 from tornado.escape import json_decode
 from tornado.ioloop import IOLoop
 from tornado.options import define, options, parse_command_line
+from tornado.process import Subprocess
 from tornado.web import Application, RequestHandler
 
 define('address', default='localhost', help='address to listen at')
@@ -12,11 +13,12 @@ define('debug', default=False, help='debug mode')
 
 class WebhookHandler(RequestHandler):
 
-    def post(self):
-        print(self.request.headers)
+    async def post(self):
         data = json_decode(self.request.body)
-        print(data)
-        self.write({'status': 'ok'})
+        time = data.get('time', 1)
+        proc = Subprocess(['sleep', str(time)])
+        code = await proc.wait_for_exit(False)
+        self.write({'code': code})
 
 
 def make_app():
