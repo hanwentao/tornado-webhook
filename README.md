@@ -7,8 +7,13 @@
 
 **Table of Contents**
 
+- [Introduction](#introduction)
 - [Installation](#installation)
 - [License](#license)
+
+## Introduction
+
+Tornado Webhook is a web application to execute webhook actions.
 
 ## Installation
 
