@@ -10,41 +10,42 @@ from tornado.process import Subprocess
 from tornado.routing import AnyMatches
 from tornado.web import Application, RequestHandler
 
-define('address', default='localhost', help='address to listen at')
+define('addr', default='localhost', help='address to listen at')
 define('port', default=8080, help='port to listen on')
+define('conf', default='webhooks.yaml', help='path to configuration file')
 define('debug', default=False, help='debug mode')
-define('config', default='webhooks.yaml', help='webhook configuration file')
 
 
 class WebhookHandler(RequestHandler):
 
     async def post(self):
-        hooks = self.settings['config']['hooks']
+        hooks = self.settings['conf']['hooks']
         url = self.request.full_url()
-        # data = json_decode(self.request.body)
+        data = json_decode(self.request.body)
         for hook in hooks:
             if hook.get('hook') == url:  # TODO: better matching method
-                app_log.info(f'URL {url} matched')
-                args = [hook.get('cmd', '/bin/bash')] + hook.get('args', [])
-                app_log.info(f'Executing task {args}')
-                proc = Subprocess(args)
+                app_log.info(f'Webhook {url} matched')
+                path = hook.get('path', '.')
+                action = hook.get('action', 'true')
+                app_log.info(f'Executing action "{action}"')
+                proc = Subprocess(['/bin/bash', '-c', action], cwd=path)
                 def proc_exit_callback(code):
-                    app_log.info(f'Task {args} done with code {code}')
+                    app_log.info(f'Action "{action}" done with code {code}')
                 proc.set_exit_callback(proc_exit_callback)
                 self.write({'status': 'executing'})
                 break
         else:
-            app_log.warning(f'URL {url} not configured')
+            app_log.warning(f'Webhook {url} not configured')
             self.write({'status': 'failure'})
             self.set_status(400)
 
 
 def make_app():
-    with open(options.config) as config_file:
-        config = yaml.safe_load(config_file)
+    with open(options.conf) as conf_file:
+        conf = yaml.safe_load(conf_file)
     return Application(
         [(AnyMatches(), WebhookHandler)],
-        config=config,
+        conf=conf,
         debug=options.debug,
     )
 
@@ -52,8 +53,8 @@ def make_app():
 if __name__ == '__main__':
     parse_command_line()
     app = make_app()
-    server = app.listen(options.port, options.address, xheaders=True)
+    server = app.listen(options.port, options.addr, xheaders=True)
     if options.debug:
         print('Debug mode activated')
-    print(f'Listening at {options.address}:{options.port}')
+    print(f'Listening at {options.addr}:{options.port}')
     IOLoop.current().start()

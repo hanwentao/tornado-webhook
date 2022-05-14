@@ -1,0 +1,9 @@
+default:
+  # the same as a hook, using as default values
+hooks:  # an array of hooks
+  - hook: https://example.com/webhook/     # webhook url
+    secret: TOP-SECRET                     # secret token
+    repo: https://github.com/example/repo  # repo url
+    branch: master                         # branch name
+    path: /home/example/repo               # local repo path
+    action: git pull && make               # command to run
