@@ -25,6 +25,9 @@ classifiers = [
 dependencies = ["tornado", "pyyaml"]
 dynamic = ["version"]
 
+[project.scripts]
+webhook = "tornado_webhook:main"
+
 [project.urls]
 Documentation = "https://github.com/hanwentao/tornado-webhook#readme"
 Issues = "https://github.com/hanwentao/tornado-webhook/issues"
